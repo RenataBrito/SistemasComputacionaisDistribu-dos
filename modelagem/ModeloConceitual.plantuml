@@ -1,0 +1,65 @@
+@startuml modelo-conceitual
+class DonoDaRede{
+    String Nome;
+    String userName;
+    Integer telefone;
+    String email;
+}
+
+class UsuarioDaRede{
+    String usuario;
+    String userName;
+    String CPF;
+    Integer telefone;
+    String email;
+    String endereco;
+}
+    
+class Vendedor{
+    Interger NumeroDeVendas;
+    Float Nota;
+}
+
+class Cliente{
+}
+
+class Carro{
+    String Owner;
+    Integer Número do produto;
+    String Modelo;
+    Interger AnoDeLançamento;
+    String Cor;
+    String Marca;
+    Float Valor;
+}
+
+class Venda{
+    Integer num_prod;
+    String  data;
+}
+
+'metodos
+Vendedor : AnunciarCarro();
+Vendedor : CancelarAnuncio();
+Vendedor : AlterarDadosDoAnuncio();
+
+Cliente : comprarCarro();
+Cliente : efetuarPagamento();
+Cliente : avaliarCompra();
+
+'composicao = UsuarioDaRede nao existe sem o DonoDaRede
+DonoDaRede *. "*"  UsuarioDaRede
+
+'herenca
+UsuarioDaRede ^-- Vendedor
+UsuarioDaRede ^-- Cliente 
+
+'multiplicidade
+Vendedor  --> "*" Carro : > anuncia
+Vendedor --> "*" Venda : > faz
+
+Cliente --> "*" Carro : > compra
+
+
+
+@enduml

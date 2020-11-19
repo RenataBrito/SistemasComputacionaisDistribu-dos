@@ -1,0 +1,44 @@
+@startuml Trabalho 2
+left to right direction
+skinparam Style strictuml
+ 
+actor "Usuario da Rede" as u_Rede
+actor "Vendedor" as vendedor
+actor "Cliente" as cliente
+actor "Dono da Rede" as dono 
+
+usecase "Modificar função de usuário" as mod
+usecase "Cadastrar na rede" as cad_Rede 
+usecase "Consultar carro" as con_car
+usecase "Comprar carro" as comp_car
+usecase "Anunciar carro" as anun_car
+usecase "Cancelar anuncio" as can_anun
+usecase "Adicionar e remover membros a rede" as mrede
+usecase "Editar cadastros na rede" as edit
+usecase "Efetuar pagamento" as pagar
+usecase "Alterar dados do anuncio" as alt_anun
+usecase "Enviar mensagem" as envia
+usecase "Avaliar Compra" as avalia
+
+'casos de uso
+u_Rede --> cad_Rede
+u_Rede --> con_car
+u_Rede --> envia
+cliente --> comp_car
+cliente --> avalia
+dono --> mod
+dono --> mrede
+dono --> edit
+vendedor --> anun_car
+anun_car -- alt_anun : extend
+anun_car -- can_anun : extend
+comp_car -- pagar : include
+
+'include = obriga a execucao do UC incluido quando UC base eh executadp
+'extend = execucao do UC estendido eh opcional
+
+'herenca
+u_Rede <|-- vendedor
+u_Rede <|-- cliente
+
+@enduml

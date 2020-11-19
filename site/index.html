@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link href="style.css" rel="stylesheet">
+<link rel="SHORTCUT ICON" HREF="../imagens/carpequeno.png">
+<title>Aluguel/Venda de carros</title>
+</head>
+
+<body></body>
+<div class="quadroInicial"> 
+    <div class="center">
+        <h1 align="center">Aluguel e Compra de carro</h1>
+        <h1 align="center">com</h1>
+        <h1 align="center">Hyperledger</h1>
+        <img class="displayed" src="../imagens/car.png" alt="Carro" width="230">
+        <br>
+        <button class="displayed" onclick="document.getElementById('id01').style.display='block'" style="width:100%;">Entre</button>
+    </div>
+</div>
+
+
+<div id="id01" class="modal">
+  
+  <form class="modal-content animate" action="/action_page.php" method="post">
+
+    <div class="container">
+        <br>
+        <label for="uname"><b>Username</b></label>
+        <input type="text" placeholder="Enter Username" name="uname" required>
+        <br>
+        <label for="psw"><b>Password</b></label>
+        <input type="password" placeholder="Enter Password" name="psw" required>
+      <button type="submit">Login</button>
+    </div>
+  </form>
+
+</div>
+<script src="transition.js"></script>
+</body>
+</html>
