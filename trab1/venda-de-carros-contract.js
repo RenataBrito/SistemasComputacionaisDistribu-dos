@@ -4,105 +4,105 @@
 
 'use strict';
 
-const { Contract } = require('fabric-contract-api');
+const { ChaincodeStub, ClientIdentity } = require('fabric-shim');
+const { VendaDeCarrosContract } = require('..');
+const winston = require('winston');
 
-class VendaDeCarrosContract extends Contract {
+const chai = require('chai');
+const chaiAsPromised = require('chai-as-promised');
+const sinon = require('sinon');
+const sinonChai = require('sinon-chai');
 
-    async vendaDeCarrosExists(ctx, vendaDeCarrosId) {
-        const buffer = await ctx.stub.getState(vendaDeCarrosId);
-        return (!!buffer && buffer.length > 0);
-    }
+chai.should();
+chai.use(chaiAsPromised);
+chai.use(sinonChai);
 
-    async aluguelDeCarrosExists(ctx, aluguelDeCarrosId) {
-        const buffer = await ctx.stub.getState(aluguelDeCarrosId);
-        return (!!buffer && buffer.length > 0);
-    }
+class TestContext {
 
-    async createVendaDeCarros(ctx, vendaDeCarrosId, modelo, cor, anoDeLancamento, marca, preco) {//atributos do carro (valor Array)
-        const exists = await this.vendaDeCarrosExists(ctx, vendaDeCarrosId);
-        if (exists) {// verifica se existe o mesmo carro
-            throw new Error(`The venda de carros ${vendaDeCarrosId} already exists`);
-        }
-        const asset = { modelo, cor, anoDeLancamento, marca, preco}; // criação do json (asset = carro)
-        const buffer = Buffer.from(JSON.stringify(asset));
-        await ctx.stub.putState(vendaDeCarrosId, buffer);
-    }
-
-    async createAluguelDeCarros(ctx, aluguelDeCarrosId, modelo, cor, anoDeLancamento, marca, placa, precoDoAluguel, dataEmprestimo, dataDevolucao, periodo) {//atributos do carro (valor Array)
-        const exists = await this.vendaDeCarrosExists(ctx, aluguelDeCarrosId);
-        if (exists) {// verifica se existe o mesmo carro
-            throw new Error(`The venda de carros ${aluguelDeCarrosId} already exists`);
-        }
-        const asset = { modelo, cor, anoDeLancamento, marca, placa, precoDoAluguel, dataEmprestimo, dataDevolucao, periodo}; // criação do json (asset = carro)
-        const buffer = Buffer.from(JSON.stringify(asset));
-        await ctx.stub.putState(aluguelDeCarrosId, buffer);
-    }
-
-    async readVendaDeCarros(ctx, vendaDeCarrosId) {
-        const exists = await this.vendaDeCarrosExists(ctx, vendaDeCarrosId);
-        if (!exists) {
-            throw new Error(`The venda de carros ${vendaDeCarrosId} does not exist`);
-        }
-        const buffer = await ctx.stub.getState(vendaDeCarrosId);
-        const asset = JSON.parse(buffer.toString());
-        return asset;
-    }
-
-    async readAluguelDeCarros(ctx, vendaDeCarrosId) {
-        const exists = await this.AluguelDeCarrosExists(ctx, aluguelDeCarrosId);
-        if (!exists) {
-            throw new Error(`The venda de carros ${aluguelDeCarrosId} does not exist`);
-        }
-        const buffer = await ctx.stub.getState(aluguelDeCarrosId);
-        const asset = JSON.parse(buffer.toString());
-        return asset;
-    }
-
-    async AtualizarDadosDaVenda(ctx, vendaDeCarrosId, newCor, newPreco) {
-        const exists = await this.vendaDeCarrosExists(ctx, vendaDeCarrosId);
-        if (!exists) {
-            throw new Error(`The venda de carros ${vendaDeCarrosId} does not exist`);
-        }
-        const asset = {
-            cor: newCor,
-            preco: newPreco
+    constructor() {
+        this.stub = sinon.createStubInstance(ChaincodeStub);
+        this.clientIdentity = sinon.createStubInstance(ClientIdentity);
+        this.logging = {
+            getLogger: sinon.stub().returns(sinon.createStubInstance(winston.createLogger().constructor)),
+            setLevel: sinon.stub(),
         };
-        const buffer = Buffer.from(JSON.stringify(asset));
-        await ctx.stub.putState(vendaDeCarrosId, buffer);
-    }
-
-    async AtualizarDadosDeAluguel(ctx, aluguelDeCarrosId, newCor, newPreco, newEmprestimo, newDevolucao, newPeriodo) {
-        const exists = await this.aluguelDeCarrosExists(ctx, aluguelDeCarrosId);
-        if (!exists) {
-            throw new Error(`The venda de carros ${aluguelDeCarrosId} does not exist`);
-        }
-        const asset = {
-            cor: newCor,
-            precoDoAluguel: newPreco,
-            dataEmprestimo: newEmprestimo,
-            dataDevolucao: newDevolucao,
-            periodo: newPeriodo
-        };
-        const buffer = Buffer.from(JSON.stringify(asset));
-        await ctx.stub.putState(aluguelDeCarrosId, buffer);
-    }
-
-    async deleteVendaDeCarros(ctx, vendaDeCarrosId) {
-        const exists = await this.vendaDeCarrosExists(ctx, vendaDeCarrosId);
-        if (!exists) {
-            throw new Error(`The venda de carros ${vendaDeCarrosId} does not exist`);
-        }
-        await ctx.stub.deleteState(vendaDeCarrosId);
-    }
-
-    async deleteAluguelDeCarros(ctx, aluguelDeCarrosId) {
-        const exists = await this.vendaDeCarrosExists(ctx, aluguelDeCarrosId);
-        if (!exists) {
-            throw new Error(`The venda de carros ${aluguelDeCarrosId} does not exist`);
-        }
-        await ctx.stub.deleteState(aluguelDeCarrosId);
     }
 
 }
 
-module.exports = VendaDeCarrosContract;
+describe('VendaDeCarrosContract', () => {
+
+    let contract;
+    let ctx;
+
+    beforeEach(() => {
+        contract = new VendaDeCarrosContract();
+        ctx = new TestContext();
+        ctx.stub.getState.withArgs('1001').resolves(Buffer.from('{"value":"venda de carros 1001 value"}'));
+        ctx.stub.getState.withArgs('1002').resolves(Buffer.from('{"value":"venda de carros 1002 value"}'));
+    });
+
+    describe('#vendaDeCarrosExists', () => {
+
+        it('should return true for a venda de carros', async () => {
+            await contract.vendaDeCarrosExists(ctx, '1001').should.eventually.be.true;
+        });
+
+        it('should return false for a venda de carros that does not exist', async () => {
+            await contract.vendaDeCarrosExists(ctx, '1003').should.eventually.be.false;
+        });
+
+    });
+
+    describe('#createVendaDeCarros', () => {
+
+        it('should create a venda de carros', async () => {
+            await contract.createVendaDeCarros(ctx, '1003', 'venda de carros 1003 value', 'preto');
+            ctx.stub.putState.should.have.been.calledOnceWithExactly('1003', Buffer.from('{"value":"venda de carros 1003 value"}'));
+        });
+
+        it('should throw an error for a venda de carros that already exists', async () => {
+            await contract.createVendaDeCarros(ctx, '1001', 'myvalue').should.be.rejectedWith(/The venda de carros 1001 already exists/);
+        });
+
+    });
+
+    describe('#readVendaDeCarros', () => {
+
+        it('should return a venda de carros', async () => {
+            await contract.readVendaDeCarros(ctx, '1001').should.eventually.deep.equal({ value: 'venda de carros 1001 value' });
+        });
+
+        it('should throw an error for a venda de carros that does not exist', async () => {
+            await contract.readVendaDeCarros(ctx, '1003').should.be.rejectedWith(/The venda de carros 1003 does not exist/);
+        });
+
+    });
+
+    describe('#updateVendaDeCarros', () => {
+
+        it('should update a venda de carros', async () => {
+            await contract.updateVendaDeCarros(ctx, '1001', 'venda de carros 1001 new value');
+            ctx.stub.putState.should.have.been.calledOnceWithExactly('1001', Buffer.from('{"value":"venda de carros 1001 new value"}'));
+        });
+
+        it('should throw an error for a venda de carros that does not exist', async () => {
+            await contract.updateVendaDeCarros(ctx, '1003', 'venda de carros 1003 new value').should.be.rejectedWith(/The venda de carros 1003 does not exist/);
+        });
+
+    });
+
+    describe('#deleteVendaDeCarros', () => {
+
+        it('should delete a venda de carros', async () => {
+            await contract.deleteVendaDeCarros(ctx, '1001');
+            ctx.stub.deleteState.should.have.been.calledOnceWithExactly('1001');
+        });
+
+        it('should throw an error for a venda de carros that does not exist', async () => {
+            await contract.deleteVendaDeCarros(ctx, '1003').should.be.rejectedWith(/The venda de carros 1003 does not exist/);
+        });
+
+    });
+
+});
