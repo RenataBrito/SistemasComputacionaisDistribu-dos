@@ -1,0 +1,68 @@
+html {
+    background: url(../imagens/fundo.png) no-repeat center center fixed;
+    background-size: cover;
+    height: 100%;
+    overflow: hidden;
+}
+
+#fundo{
+    background-color:#636befbd;
+    text-align:center;
+    margin: 0;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    height: 600px;
+    width: 500px;
+}
+
+.titulo{
+    width: 100%;
+    background: linear-gradient(to bottom, #5592bb 0%, #327cad 66%, #1C6EA4 100%);
+    position: relative;
+}
+
+.botaoCompra{
+    width: 100%;
+    background: linear-gradient(to bottom, #5592bb 0%, #327cad 66%, #1C6EA4 100%);
+    position: relative;
+}
+
+.conteudo{
+    width: 100%;
+    background: linear-gradient(to bottom, #5592bb 0%, #327cad 66%, #1C6EA4 100%);
+    position: relative;
+}
+
+.inputs{
+    width: 80%;
+    background-color: #a6baf4;
+    position: relative;
+    font-size: 50px;
+    border: 1px solid #9cd7ff;
+    margin-left: 50px;
+}
+
+input{
+    line-height: 70px;
+    text-align:center;
+}
+
+#corTitulo{
+    color: #FFFFFF;
+}
+
+button {
+    background-color: #4169e1;
+    color: white;
+    padding: 14px 20px;
+    margin: 8px 0;
+    border: none;
+    cursor: pointer;
+    width: 90%;
+  }
+  
+button:hover {
+    opacity: 0.8;
+}
